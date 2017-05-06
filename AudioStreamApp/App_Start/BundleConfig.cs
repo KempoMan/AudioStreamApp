@@ -20,6 +20,7 @@ namespace AudioStreamApp
                         "~/Scripts/modernizr-*"));
 
             bundles.Add(new ScriptBundle("~/bundles/bootstrap").Include(
+                      "~/Scripts/dataTables/jquery.dataTables.js",
                       "~/Scripts/bootstrap.js",
                       "~/Scripts/respond.js"));
 
