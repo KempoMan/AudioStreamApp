@@ -1,30 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
+using AudioStreamApp.ViewModels;
 
 namespace AudioStreamApp.Controllers
 {
     public class HomeController : Controller
     {
+        private readonly List<char> _letters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ".ToList();
+
         public ActionResult Index()
         {
-            return View();
-        }
+            var vm = new MediaList {Letters = _letters};
 
-        public ActionResult About()
-        {
-            ViewBag.Message = "Your application description page.";
-
-            return View();
-        }
-
-        public ActionResult Contact()
-        {
-            ViewBag.Message = "Your contact page.";
-
-            return View();
+            return View(vm);
         }
     }
 }
