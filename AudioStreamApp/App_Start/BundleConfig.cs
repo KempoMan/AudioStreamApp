@@ -20,12 +20,19 @@ namespace AudioStreamApp
                         "~/Scripts/modernizr-*"));
 
             bundles.Add(new ScriptBundle("~/bundles/bootstrap").Include(
-                      "~/Scripts/dataTables/jquery.dataTables.js",
                       "~/Scripts/bootstrap.js",
+                      "~/Scripts/dataTables/jquery.dataTables.min.js",
+                      //"~/Scripts/dataTables/dataTables.bootstrap.min.js",
+                      "~/Scripts/dataTables/dataTables.select.min.js",                      
                       "~/Scripts/respond.js"));
 
             bundles.Add(new StyleBundle("~/Content/css").Include(
                       "~/Content/bootstrap.css",
+                      //"~/Content/bootstrap-theme.css",
+                      "~/Content/dataTables.bootstrap.min.css",
+                      //"~/Content/select.dataTables.min.css",
+                      //"~/Content/select.bootstrap.min.css",
+                      //"~/Content/datatables.min.css",
                       "~/Content/site.css"));
         }
     }

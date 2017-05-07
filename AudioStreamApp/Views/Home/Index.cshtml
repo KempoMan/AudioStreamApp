@@ -3,66 +3,66 @@
     ViewBag.Title = "Home Page";
 }
 
-@foreach (var letter in Model.Letters)
-{
-    <a href="#" onclick="event.preventDefault();getArtists('@letter');">@letter</a>
-}
+<br />
+<div class="btn-group">
+    @foreach (var letter in Model.Letters)
+    {
+        <button type="button" class="btn btn-default" onclick="event.preventDefault();getArtists('@letter');">@letter</button>
+        if (letter == '9')
+        {
+            <br /><br />
+        }
+    }
+    <br />
+    <br />
+    <br />
+</div>
 
 <div class="container">
     <div class="row">
         <div class="col-md-4">
-            <table id="artists" class="table table-striped table-condensed">
+            <table id="artists" class="table table-bordered">
                 <thead>
-                <tr>
-                    <th>Artists</th>
-                </tr>
+                    <tr>
+                        <th>Artists</th>
+                    </tr>
                 </thead>
                 <tbody>
-                <tr>
-                    <td>
-                        
-                    </td>
-                </tr>
+                    <tr>
+                        <td></td>
+                    </tr>
                 </tbody>
             </table>
         </div>
         <div class="col-md-4">
-            <table id="albums" class="table table-striped table-condensed">
+            <table id="albums" class="table table-bordered">
                 <thead>
-                <tr>
-                    <th>Albums</th>
-                    <th>Artist</th>
-                </tr>
+                    <tr>
+                        <th>Albums</th>
+                        <th>Artist</th>
+                    </tr>
                 </thead>
                 <tbody>
-                <tr>
-                    <td>
-                        
-                    </td>
-                    <td>
-                        
-                    </td>
-                </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                    </tr>
                 </tbody>
-            </table>            
+            </table>
         </div>
         <div class="col-md-4">
-            <table id="songs" class="table table-striped table-condensed">
+            <table id="songs" class="table table-bordered">
                 <thead>
-                <tr>
-                    <th>Songs</th>
-                    <th>Album</th>
-                </tr>
+                    <tr>
+                        <th>Songs</th>
+                        <th>Album</th>
+                    </tr>
                 </thead>
                 <tbody>
-                <tr>
-                    <td>
-                        
-                    </td>
-                    <td>
-                        
-                    </td>
-                </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                    </tr>
                 </tbody>
             </table>
         </div>
@@ -85,6 +85,12 @@
         var albumTable;
         var songsTable;
 
+        var emptyArtistData = [
+            {
+                "name": " - "
+            }
+        ];
+
         var emptyAlbumData = [
             {
                 "albumName": " - ",
@@ -94,56 +100,78 @@
 
         var emptySongData = [
             {
-                "songName": " - ",
-                "albumName": " - "
+                "name": " - ",
+                "album": " - "
             }
         ];
 
-        $(document).ready(function() {
+        $(document).ready(function () {
             artistTable = $("#artists").DataTable({
-                "ajax": {
-                    "url": "/audiostreamapp/api/filesystem/getartists",
-                    dataSrc: ""
-                },
+                select: true,
+                searching: false,
+                ordering: false,
+                lengthChange: false,
+                info: false,
+                data: emptyArtistData,
                 columns: [
                     {
-                        data: "name",
-                        render: function(data) {
-                            return "<a href=\"#\" onclick=\"event.preventDefault();getAlbums('" + data + "');\">" + data + "</a>";
-                        }
+                        data: "name"
                     }
                 ]
-
             });
+
             albumTable = $("#albums").DataTable({
+                select: true,
+                searching: false,
+                ordering: false,
+                lengthChange: false,
+                info: false,
                 data: emptyAlbumData,
                 columns: [
                     {
-                        data: 'albumName',
-                        render: function(data) {
-                            if (data === " - ") {
-                                return data;
-                            }
-
-                            return "<a href=\"#\" onclick=\"event.preventDefault();getSongs('" + data + "');\">" + data + "</a>";
-                        }
+                        data: 'albumName'
                     },
                     { data: 'artistName' }
                 ]
             });
+
             songsTable = $("#songs").DataTable({
+                select: true,
+                searching: false,
+                ordering: false,
+                lengthChange: false,
+                info: false,
                 data: emptySongData,
                 columns: [
-                    { data: 'songName' },
-                    { data: 'albumName' }
+                    { data: 'name' },
+                    { data: 'album' }
                 ]
             });
+
+            artistTable.on('select',
+                function (e, dt, type, indexes) {
+                    if (type === 'row') {
+                        var artist = artistTable.rows(indexes).data().pluck('name');
+                        getAlbums(artist[0]);
+                    }
+                });
+
+            albumTable.on('select',
+                function (e, dt, type, indexes) {
+                    if (type === 'row') {
+                        var artist = albumTable.rows(indexes).data().pluck('artistName');
+                        var album = albumTable.rows(indexes).data().pluck('albumName');
+
+                        getSongs(artist[0], album[0]);
+                    }
+                });
         });
+
 
         function getArtists(letter) {
             $.get("/audiostreamapp/api/filesystem/getartists",
                 {
-                     letter: letter
+                    letter: letter
                 },
                 function (data) {
                     artistTable.clear();
@@ -164,11 +192,11 @@
                 });
         }
 
-        function getSongs(album) {
-            alert(album); return;
+        function getSongs(artist, album) {
             $.get("/audiostreamapp/api/filesystem/getsongs",
                 {
-                    album: album
+                    albumName: album,
+                    artistName: artist
                 },
                 function (data) {
                     songsTable.clear();
