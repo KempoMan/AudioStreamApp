@@ -11,8 +11,12 @@ namespace AudioStreamApp
 {
     public class MvcApplication : System.Web.HttpApplication
     {
+        public static List<string> PlayList { get; set; }
+
         protected void Application_Start()
         {
+            PlayList = new List<string>();
+
             GlobalConfiguration.Configure(WebApiConfig.Register);
             AreaRegistration.RegisterAllAreas();
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);

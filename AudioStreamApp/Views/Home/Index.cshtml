@@ -1,79 +1,91 @@
 ﻿@model AudioStreamApp.ViewModels.MediaList
 @{
-    ViewBag.Title = "Home Page";
+    ViewBag.Title = "Main Player";
 }
 
-<br />
-<div class="btn-group">
-    @foreach (var letter in Model.Letters)
-    {
-        <button type="button" class="btn btn-default" onclick="event.preventDefault();getArtists('@letter');">@letter</button>
-        if (letter == '9')
-        {
-            <br /><br />
-        }
-    }
-    <br />
-    <br />
-    <br />
-</div>
-
-<div class="container">
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12">
+            <audio id="audio" controls="controls">
+                <source id="audioSource" src="" type="audio/mp3"/>
+            </audio>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="btn-group">
+                @foreach (var letter in Model.Letters)
+                {
+                    <button type="button" class="btn btn-default" onclick="event.preventDefault();getArtists('@letter');">@letter</button>
+                    if (letter == '9')
+                    {
+                        <br/><br/>
+                    }
+                }
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="panel panel-default">
+                <div class="panel-heading">Playlist</div>
+                <div class="panel-body">
+                    <ul class="list-group">
+                        @foreach (var song in MvcApplication.PlayList)
+                        {
+                            <li class="list-group-item">@song</li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="row">
         <div class="col-md-4">
             <table id="artists" class="table table-bordered">
                 <thead>
-                    <tr>
-                        <th>Artists</th>
-                    </tr>
+                <tr>
+                    <th>Artists</th>
+                </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td></td>
-                    </tr>
+                <tr>
+                    <td></td>
+                </tr>
                 </tbody>
             </table>
         </div>
         <div class="col-md-4">
             <table id="albums" class="table table-bordered">
                 <thead>
-                    <tr>
-                        <th>Albums</th>
-                        <th>Artist</th>
-                    </tr>
+                <tr>
+                    <th>Albums</th>
+                    <th>Artist</th>
+                </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td></td>
-                        <td></td>
-                    </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                </tr>
                 </tbody>
             </table>
         </div>
         <div class="col-md-4">
             <table id="songs" class="table table-bordered">
                 <thead>
-                    <tr>
-                        <th>Songs</th>
-                        <th>Album</th>
-                    </tr>
+                <tr>
+                    <th>Songs</th>
+                    <th>Album</th>
+                    <th>path</th>
+                </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td></td>
-                        <td></td>
-                    </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
                 </tbody>
             </table>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-12">
-            <div id="aPlayer">
-                <audio controls="controls">
-                    <source src="~/Audio/01%20Heat%20Of%20The%20Moment.mp3" type="audio/mpeg" />
-                </audio>
-            </div>
         </div>
     </div>
 </div>
@@ -100,8 +112,9 @@
 
         var emptySongData = [
             {
-                "name": " - ",
-                "album": " - "
+                "title": " - ",
+                "album": " - ",
+                "fullName" : " - "
             }
         ];
 
@@ -143,8 +156,12 @@
                 info: false,
                 data: emptySongData,
                 columns: [
-                    { data: 'name' },
-                    { data: 'album' }
+                    { data: 'title' },
+                    { data: 'album' },
+                    {
+                        data: 'fullName',
+                        visible: false
+                    }
                 ]
             });
 
@@ -165,8 +182,23 @@
                         getSongs(artist[0], album[0]);
                     }
                 });
-        });
 
+            songsTable.on('select',
+                function (e, dt, type, indexes) {
+                    if (type === 'row') {
+                        var sourceUrl = songsTable.rows(indexes).data();
+
+                        var audio = $("#audio").get(0);
+                        var source = $("#audioSource");
+
+                        audio.pause();
+                        source[0].src = "../mp3/" + sourceUrl[0].artist + "/" + sourceUrl[0].album + "/" + sourceUrl[0].name;
+                        audio.load();
+                        
+                        audio.play();
+                    }
+                });
+        });
 
         function getArtists(letter) {
             $.get("/audiostreamapp/api/filesystem/getartists",

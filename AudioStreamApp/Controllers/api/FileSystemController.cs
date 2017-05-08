@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using System.Web.Http;
 using AudioStreamApp.Models;
 
-
 namespace AudioStreamApp.Controllers.api
 {
-
     public class FileSystemController : ApiController
     {
         public const string RootDir = @"I:\mp3"; //TODO: convert to config entry
@@ -35,6 +31,7 @@ namespace AudioStreamApp.Controllers.api
         public IHttpActionResult GetSongs([FromUri]Album album)
         {
             var dirs = new DirectoryInfo($@"{RootDir}\{album.ArtistName}\{album.AlbumName}");
+
             var result = dirs.GetFiles("*.mp3")
                 .Select(r => new
                 {
@@ -43,7 +40,9 @@ namespace AudioStreamApp.Controllers.api
                     r.DirectoryName,
                     r.FullName,
                     r.Length,
-                    Album = album.AlbumName
+                    Artist = TagLib.File.Create(r.FullName).Tag.FirstAlbumArtist,
+                    Album = TagLib.File.Create(r.FullName).Tag.Album,
+                    Title = TagLib.File.Create(r.FullName).Tag.Title
                 })
                 .ToList();
 
